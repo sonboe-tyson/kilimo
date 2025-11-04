@@ -10,30 +10,30 @@
 body{ font-family:'Poppins',sans-serif; margin:0; padding:0; background:rgba(200,255,200,0.25); background-image:url('background.jpg'); background-size:cover; background-position:center;}
 header{text-align:center; background:var(--green); color:#fff; padding:18px 10px; font-size:26px; font-weight:700;}
 .container{ max-width:700px; margin:28px auto; background:#ffffffe6; padding:22px; border-radius:14px; box-shadow:0 6px 30px rgba(0,0,0,0.15);}
-.profile{ display:flex; justify-content:flex-end; align-items:center; gap:14px;}
-.profile img{ width:150px; height:150px; border-radius:50%; object-fit:cover; border:4px solid var(--red);}
-.profile .subtitle{text-align:center; font-size:13px; color:#333; line-height:1.1; white-space:pre-line;}
+.profile{ display:flex; justify-content:flex-end; align-items:center; gap:14px; animation:fadeIn 1s ease-in-out;}
+.profile img{ width:150px; height:150px; border-radius:50%; object-fit:cover; border:4px solid var(--red); animation:pulse 2s infinite;}
+.profile .subtitle{text-align:center; font-size:13px; color:#333; line-height:1.1; white-space:pre-line; animation:fadeIn 1s ease-in-out;}
 form .row{ display:flex; gap:18px; align-items:flex-start; flex-wrap:wrap; }
 .left, .right { flex:1 1 320px; min-width:280px; }
 label{ display:block; margin-top:8px; font-weight:600; color:#222; }
 input, select, button { width:100%; padding:10px; margin-top:6px; border-radius:8px; border:1px solid #ccc; font-size:15px; }
-button{ background:var(--red); color:white; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;}
-button:hover{ background:#c0392b; }
-button.vertical{ flex-direction:column; padding:12px; font-size:16px; }
-#adviceResult{ margin-top:16px; padding:15px; border-radius:10px; background: rgba(255,0,0,0.1); font-weight:600; color:#0b3; white-space:pre-line; }
+button{ background:var(--red); color:white; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; animation:fadeIn 1s ease-in-out;}
+button:hover{ background:#c0392b; animation:bounce 0.5s;}
+button.vertical{ flex-direction:column; padding:12px; font-size:16px;}
+#adviceResult{ margin-top:16px; padding:15px; border-radius:10px; background: rgba(255,0,0,0.1); font-weight:600; color:#0b3; white-space:pre-line; animation:fadeIn 1s ease-in-out;}
 canvas{ margin-top:20px; width:100% !important; height:400px !important; }
 .crop-thumbs{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
-.thumb{ width:90px; height:70px; border-radius:8px; overflow:hidden; border:2px solid transparent; cursor:pointer; text-align:center; display:flex; align-items:center; justify-content:center; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.08);}
+.thumb{ width:90px; height:70px; border-radius:8px; overflow:hidden; border:2px solid transparent; cursor:pointer; text-align:center; display:flex; align-items:center; justify-content:center; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
 .thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
 .thumb.selected{ border-color:var(--red); box-shadow:0 4px 14px rgba(231,76,60,0.3); }
 .lang-area{ text-align:center; margin-top:8px; }
 .meta-small{ font-size:13px; color:#555; margin-top:6px; }
 .globalMicBtn{ background:#ff0000; color:#fff; font-weight:bold; border-radius:50%; width:60px; height:60px; display:flex; align-items:center; justify-content:center; margin:auto; margin-bottom:12px; animation: pulse 1.5s infinite; cursor:pointer; border:3px solid #fff; font-size:20px;}
 @keyframes pulse{0%{transform:scale(1);}50%{transform:scale(1.2);}100%{transform:scale(1);}}
-@media (max-width:720px){ .left, .right { min-width:100%; } .crop-thumbs{ justify-content:flex-start; } }
-
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
 .fade-in{ animation:fadeIn 0.8s ease-in-out; }
 @keyframes fadeIn{ from {opacity:0; transform: translateY(10px);} to {opacity:1; transform:translateY(0);} }
+@media (max-width:720px){ .left, .right { min-width:100%; } .crop-thumbs{ justify-content:flex-start; } }
 </style>
 </head>
 <body>
@@ -44,7 +44,7 @@ canvas{ margin-top:20px; width:100% !important; height:400px !important; }
   </div>
 </header>
 
-<div class="container">
+<div class="container fade-in">
   <div class="profile">
     <div><img id="profileImg" src="profile.jpg" alt="Profile"></div>
     <div class="subtitle">
@@ -53,16 +53,16 @@ Name:Taisoni Ambokile Mwaluswaswa
 Phone No:0749458547
 Professionalism:GIS and RS Expert
 Gmail:taisonimwuluswaswa@gmail.com   
-   💯💪🏾 
-   </div>
+💯💪🏾
+    </div>
   </div>
 
   <form id="mainForm" onsubmit="return false;">
     <div class="row">
       <div class="left">
 
-        <!-- NEW GLOBAL MIC BUTTON -->
-        <div class="globalMicBtn" id="globalMicBtn">🎤</div>
+        <!-- GLOBAL MIC BUTTON -->
+        <div class="globalMicBtn" id="globalMicBtn" title="Voice Command">🎤</div>
 
         <label id="lblName">Full Name:</label>
         <input id="farmerName" type="text" placeholder="Enter your name" />
@@ -81,8 +81,10 @@ Gmail:taisonimwuluswaswa@gmail.com
         <select id="cropSelect"></select>
 
         <div class="crop-thumbs" id="cropThumbs" aria-hidden="false"></div>
-        <div class="meta-small">Tip: you may click thumbnail to choose crop.</div>
+        <div class="meta-small">Tip: click thumbnail to choose crop.</div>
+      </div>
 
+      <div class="right">
         <label id="lblChartType">Chart Type:</label>
         <select id="chartType">
           <option value="line">Line (monthly)</option>
@@ -90,15 +92,13 @@ Gmail:taisonimwuluswaswa@gmail.com
         </select>
 
         <div style="display:flex; flex-direction:column; gap:12px; margin-top:12px;">
-          <button type="button" class="vertical" onclick="showTrend()">📊  Show Trend😁</button>
+          <button type="button" class="vertical" onclick="showTrend()">📊 Show Trend</button>
           <button type="button" class="vertical" onclick="showAdvice()">💬 Show Advice</button>
           <button type="button" class="vertical" onclick="checkWeather()">🌦️ Check Weather</button>
+          <button type="button" class="vertical" onclick="forecast5Days()">📈 5-Day Forecast</button>
         </div>
 
         <div id="adviceResult" aria-live="polite"></div>
-      </div>
-
-      <div class="right">
         <canvas id="trendChart"></canvas>
       </div>
     </div>
@@ -109,8 +109,7 @@ Gmail:taisonimwuluswaswa@gmail.com
 const apiKey = "4970f8ff4bc343c5721c08b2e682f022";
 let currentLang = 'en';
 let chartInstance = null;
-const startYear = 2016;
-const endYear = 2025;
+const startYear = 2016, endYear = 2025;
 const monthsNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const totalMonths = (endYear-startYear+1)*12;
 
@@ -136,14 +135,10 @@ const cropsSW = ["Mahindi","Mpunga","Chai","Kahawa","Maharage","Viazi","Ufuta"];
 const cropImages = { Mahindi:"mahindi.jpg", Mpunga:"mpunga.jpg", Chai:"chai.jpg", Kahawa:"kahawa.jpg", Maharage:"maharage.jpg", Viazi:"viazi.jpg", Ufuta:"ufuta.jpg" };
 
 // ---------------- BUILD MONTHLY LABELS ----------------
-function buildMonthlyLabels(){
-  const labels = [];
-  for(let y=startYear; y<=endYear; y++){
-    for(let m=0; m<12; m++){ labels.push(`${y} ${monthsNames[m]}`); }
-  }
-  return labels;
+const monthlyLabels=[];
+for(let y=startYear; y<=endYear; y++){
+  for(let m=0;m<12;m++){ monthlyLabels.push(`${y} ${monthsNames[m]}`); }
 }
-const monthlyLabels = buildMonthlyLabels();
 
 // ---------------- RANDOM DATA FOR CROPS ----------------
 const cropData = {};
@@ -154,8 +149,7 @@ cropsSW.forEach(c=>{
     let baseRain=100, baseTemp=22, baseNDVI=0.5;
     switch(c){
       case "Mahindi": baseRain=90; baseTemp=22; baseNDVI=0.45; break;
-      case "Mpunga": baseRain=160; baseTemp=27
-; break;
+      case "Mpunga": baseRain=160; baseTemp=27; break;
       case "Chai": baseRain=140; baseTemp=19; baseNDVI=0.7; break;
       case "Kahawa": baseRain=130; baseTemp=21; baseNDVI=0.6; break;
       case "Maharage": baseRain=110; baseTemp=24; baseNDVI=0.5; break;
@@ -223,8 +217,8 @@ function playSound(){ try{ const a=new Audio(clickSoundURL); a.volume=0.35; a.pl
 // ---------------- VOICE SPEECH ----------------
 function speakText(text, gender){
   const utter = new SpeechSynthesisUtterance(text);
-  if(currentLang==='en'){ utter.lang='en-US'; utter.pitch = gender==='female'?1.3:0.85; }
-  else{ utter.lang='sw-TZ'; utter.pitch = gender==='female'?1.3:0.85; }
+  utter.lang=currentLang==='en'?'en-US':'sw-TZ';
+  utter.pitch=gender==='female'?1.3:0.85;
   utter.rate=1;
   try{ window.speechSynthesis.cancel(); window.speechSynthesis.speak(utter); }catch(e){}
   playSound();
@@ -298,15 +292,43 @@ function checkWeather(){
   fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`)
   .then(res=>res.json())
   .then(data=>{
-    const todayData=data.list[0];
-    const tomorrowData=data.list[1];
-    const weatherEN=`Weather in ${region.name}:\nToday: ${todayData.main.temp}°C, Humidity: ${todayData.main.humidity}%, ${todayData.weather[0].description}, Rain chance: ${(todayData.pop*100).toFixed(0)}%\nTomorrow: ${tomorrowData.main.temp}°C, Humidity: ${tomorrowData.main.humidity}%, ${tomorrowData.weather[0].description}, Rain chance: ${(tomorrowData.pop*100).toFixed(0)}%`;
-    const weatherSW=`Hali ya hewa ${region.name}:\nLeo: ${todayData.main.temp}°C, Unyevu: ${todayData.main.humidity}%, ${todayData.weather[0].description}, Uwezekano wa mvua: ${(todayData.pop*100).toFixed(0)}%\nKesho: ${tomorrowData.main.temp}°C, Unyevu: ${tomorrowData.main.humidity}%, ${tomorrowData.weather[0].description}, Uwezekano wa mvua: ${(tomorrowData.pop*100).toFixed(0)}%`;
-    const text=currentLang==='en'?weatherEN:weatherSW;
+    let text="";
+    for(let i=0;i<5;i++){
+      const dayData = data.list[i*8]; // roughly every 24h
+      if(currentLang==='en'){
+        text+=`Day ${i+1} (${dayData.dt_txt.split(' ')[0]}): Temp ${dayData.main.temp}°C, Humidity ${dayData.main.humidity}%, ${dayData.weather[0].description}, Rain chance ${(dayData.pop*100).toFixed(0)}%\n`;
+      } else {
+        text+=`Siku ${i+1} (${dayData.dt_txt.split(' ')[0]}): Joto ${dayData.main.temp}°C, Unyevu ${dayData.main.humidity}%, ${dayData.weather[0].description}, Uwezekano wa mvua ${(dayData.pop*100).toFixed(0)}%\n`;
+      }
+    }
     document.getElementById('adviceResult').innerText=text;
     speakText(text,'female');
+
+    // Build trend chart for 5 days
+    const temps = [], rains = [];
+    for(let i=0;i<5;i++){
+      const d = data.list[i*8];
+      temps.push(d.main.temp);
+      rains.push(d.pop*100);
+    }
+    const ctx=document.getElementById('trendChart').getContext('2d');
+    if(chartInstance) chartInstance.destroy();
+    chartInstance = new Chart(ctx,{
+      type:'line',
+      data:{
+        labels:[...Array(5)].map((_,i)=>`Day ${i+1}`),
+        datasets:[
+          {label:'Temperature °C', data:temps, borderColor:'#ff9933', backgroundColor:'#ffd699', fill:false, tension:0.25},
+          {label:'Rain Chance %', data:rains, borderColor:'#0066cc', backgroundColor:'#99ccff', fill:false, tension:0.25}
+        ]
+      },
+      options:{ responsive:true, plugins:{ legend:{position:'top'} } }
+    });
   }).catch(err=>{ alert('Weather API error'); console.error(err); });
 }
+
+// ---------------- 5-DAY FORECAST BUTTON ----------------
+function forecast5Days(){ checkWeather(); }
 
 // ---------------- LANGUAGE TOGGLE ----------------
 document.getElementById('langToggle').addEventListener('click', ()=>{
@@ -334,25 +356,37 @@ if('webkitSpeechRecognition' in window){
       if(event.results[i].isFinal){
         const spoken = event.results[i][0].transcript.trim().toLowerCase();
         console.log('Heard:', spoken);
-        if(spoken.includes('name')){
+
+        // Detect fields
+        if(spoken.includes('name')){ 
           const name = spoken.replace('name','').trim();
-          document.getElementById('farmerName').value = name;
-        } else if(spoken.includes('gender')){
+          document.getElementById('farmerName').value=name;
+        } 
+        if(spoken.includes('gender')){
           if(spoken.includes('male')) document.getElementById('gender').value='male';
           else if(spoken.includes('female')) document.getElementById('gender').value='female';
-        } else if(spoken.includes('region')){
+        }
+        if(spoken.includes('region')){
           regionsAPI.forEach(r=>{
             if(spoken.includes(r.name.toLowerCase())) document.getElementById('region').value = JSON.stringify(r);
           });
-        } else if(spoken.includes('crop')){
+        }
+        if(spoken.includes('crop')){
           cropsEN.forEach(c=>{
-            if(spoken.includes(c.toLowerCase())) cropSelect.value = c;
+            if(spoken.includes(c.toLowerCase())) cropSelect.value=c;
           });
         }
+
+        // Detect commands
+        if(spoken.includes('show trend')) showTrend();
+        if(spoken.includes('show advice')) showAdvice();
+        if(spoken.includes('check weather')) checkWeather();
+        if(spoken.includes('forecast')) forecast5Days();
       }
     }
   };
 }
+
 micBtn.addEventListener('click', ()=>{
   if(recognition) recognition.start();
   playSound();
