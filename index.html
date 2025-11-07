@@ -11,24 +11,38 @@ body{ font-family:'Poppins',sans-serif; margin:0; padding:0; background:rgba(200
 header{text-align:center; background:var(--green); color:#fff; padding:18px 10px; font-size:26px; font-weight:700;}
 .container{ max-width:700px; margin:28px auto; background:#ffffffe6; padding:22px; border-radius:14px; box-shadow:0 6px 30px rgba(0,0,0,0.15);}
 .profile{ display:flex; justify-content:flex-end; align-items:center; gap:14px; animation:fadeIn 1s ease-in-out;}
-.profile img{ width:150px; height:150px; border-radius:50%; object-fit:cover; border:4px solid var(--red); animation:pulse 2s infinite;}
-.profile .subtitle{text-align:center; font-size:13px; color:#333; line-height:1.1; white-space:pre-line; animation:fadeIn 1s ease-in-out;}
+.profile img{ width:50px; height:50px; border-radius:50%; object-fit:cover; border:2px solid #C0392B; animation:pulse 2s infinite;}
+.profile .subtitle{text-align:center; font-size:10px; color:#16A085; line-height:1.1; white-space:pre-line; animation:fadeIn 1s ease-in-out;}
 form .row{ display:flex; gap:18px; align-items:flex-start; flex-wrap:wrap; }
 .left, .right { flex:1 1 320px; min-width:280px; }
 label{ display:block; margin-top:8px; font-weight:600; color:#222; }
 input, select, button { width:100%; padding:10px; margin-top:6px; border-radius:8px; border:1px solid #ccc; font-size:15px; }
-button{ background:var(--red); color:white; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; animation:fadeIn 1s ease-in-out;}
-button:hover{ background:#c0392b; animation:bounce 0.5s;}
+button{ background:#27AE60; color:white; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; animation:fadeIn 1s ease-in-out;}
+button:hover{ background:#E67E22; animation:bounce 0.5s;}
 button.vertical{ flex-direction:column; padding:12px; font-size:16px;}
-#adviceResult{ margin-top:16px; padding:15px; border-radius:10px; background: rgba(255,0,0,0.1); font-weight:600; color:#0b3; white-space:pre-line; animation:fadeIn 1s ease-in-out;}
+#adviceResult{ margin-top:16px; padding:15px; border-radius:10px; background: rgba(255,0,0,0.1); font-weight:600; color:#FFA07A; white-space:pre-line; animation:fadeIn 1s ease-in-out;}
 canvas{ margin-top:20px; width:100% !important; height:400px !important; }
-.crop-thumbs{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+.crop-thumbs{ display:flex; gap:20px; flex-wrap:wrap; margin-top:20px; }
 .thumb{ width:90px; height:70px; border-radius:8px; overflow:hidden; border:2px solid transparent; cursor:pointer; text-align:center; display:flex; align-items:center; justify-content:center; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
-.thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+.thumb img{ width:180%; height:150%; object-fit:cover; display:block; }
 .thumb.selected{ border-color:var(--red); box-shadow:0 4px 14px rgba(231,76,60,0.3); }
 .lang-area{ text-align:center; margin-top:8px; }
 .meta-small{ font-size:13px; color:#555; margin-top:6px; }
-.globalMicBtn{ background:#ff0000; color:#fff; font-weight:bold; border-radius:50%; width:60px; height:60px; display:flex; align-items:center; justify-content:center; margin:auto; margin-bottom:12px; animation: pulse 1.5s infinite; cursor:pointer; border:3px solid #fff; font-size:20px;}
+.globalMicBtn{ background:#E67E22; color:#fff; font-weight:bold; border-radius:50%; width:30px; height:30px; display:flex; align-items:center; justify-content:center; margin:auto; margin-bottom:12px; animation: pulse 1.5s infinite; cursor:pointer; border:3px solid #fff; font-size:20px;}
+.globalMicBtn.listening {
+  box-shadow: 0 0 0 8px rgba(255,0,0,0.12), 0 0 24px rgba(255,0,0,0.08);
+  transform: scale(2.08);
+  border-color: #1ABC9C;
+  outline: 5px solid rgba(255,0,0,0.08);
+  animation: pulse 1s infinite;
+}
+.globalMicBtn[aria-pressed="true"]::after{
+  content: " • listening";
+  font-size:14px;
+  margin-left:12px;
+  opacity:0.9;
+}
+
 @keyframes pulse{0%{transform:scale(1);}50%{transform:scale(1.2);}100%{transform:scale(1);}}
 @keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
 .fade-in{ animation:fadeIn 0.8s ease-in-out; }
@@ -48,12 +62,12 @@ canvas{ margin-top:20px; width:100% !important; height:400px !important; }
   <div class="profile">
     <div><img id="profileImg" src="profile.jpg" alt="Profile"></div>
     <div class="subtitle">
-Created by
+
 Name:Taisoni Ambokile Mwaluswaswa
-Phone No:0749458547
+📞Phone No:0749458547
 Professionalism:GIS and RS Expert
-Gmail:taisonimwuluswaswa@gmail.com   
-💯💪🏾
+📧 Gmail:taisonimwuluswaswa@gmail.com   
+
     </div>
   </div>
 
@@ -342,55 +356,171 @@ document.getElementById('langToggle').addEventListener('click', ()=>{
   populateCrops();
 });
 
-// ---------------- GLOBAL MIC ----------------
 const micBtn = document.getElementById('globalMicBtn');
-let recognition;
-if('webkitSpeechRecognition' in window){
-  recognition = new webkitSpeechRecognition();
-  recognition.continuous = true;
-  recognition.interimResults = false;
-  recognition.lang = 'en-US';
+let recognition = null;
+let micActive = false;
 
-  recognition.onresult = function(event){
-    for(let i=event.resultIndex; i<event.results.length; ++i){
-      if(event.results[i].isFinal){
-        const spoken = event.results[i][0].transcript.trim().toLowerCase();
-        console.log('Heard:', spoken);
-
-        // Detect fields
-        if(spoken.includes('name')){ 
-          const name = spoken.replace('name','').trim();
-          document.getElementById('farmerName').value=name;
-        } 
-        if(spoken.includes('gender')){
-          if(spoken.includes('male')) document.getElementById('gender').value='male';
-          else if(spoken.includes('female')) document.getElementById('gender').value='female';
-        }
-        if(spoken.includes('region')){
-          regionsAPI.forEach(r=>{
-            if(spoken.includes(r.name.toLowerCase())) document.getElementById('region').value = JSON.stringify(r);
-          });
-        }
-        if(spoken.includes('crop')){
-          cropsEN.forEach(c=>{
-            if(spoken.includes(c.toLowerCase())) cropSelect.value=c;
-          });
-        }
-
-        // Detect commands
-        if(spoken.includes('show trend')) showTrend();
-        if(spoken.includes('show advice')) showAdvice();
-        if(spoken.includes('check weather')) checkWeather();
-        if(spoken.includes('forecast')) forecast5Days();
-      }
+function createRecognition(){
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SpeechRec) return null;
+  const r = new SpeechRec();
+  r.continuous = true;
+  r.interimResults = false;
+  r.maxAlternatives = 1;
+  r.lang = currentLang === 'en' ? 'en-US' : 'sw-TZ';
+  r.onresult = handleSpeechResult;
+  r.onerror = (e) => {
+    console.error('SpeechRecognition error:', e);
+    stopListening();
+    // show friendly message to user
+    alert(currentLang==='en'?'Voice recognition error. Check microphone permissions.':'Hitilafu ya utambuzi wa sauti. Angalia ruhusa za mikrofoni.');
+  };
+  r.onend = () => {
+    // if micActive is true, restart (resilient continuous mode)
+    if(micActive){
+      try { r.start(); } catch(e){ console.warn('Could not restart recognition', e); }
+    } else {
+      updateMicUI(false);
     }
   };
+  r.onnomatch = (e) => { console.log('No match', e); };
+  return r;
 }
 
-micBtn.addEventListener('click', ()=>{
-  if(recognition) recognition.start();
+function startListening(){
+  if(!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)){
+    alert(currentLang==='en'?'Your browser does not support Speech Recognition. Use Chrome on Android/desktop.':'Kivinjari chako hakitambulii utambuzi wa sauti. Tumia Chrome kwenye simu/kompyuta.');
+    return;
+  }
+  if(!recognition) recognition = createRecognition();
+  if(!recognition) return;
+  // update lang to latest currentLang
+  recognition.lang = currentLang === 'en' ? 'en-US' : 'sw-TZ';
+  try {
+    recognition.start();
+    micActive = true;
+    updateMicUI(true);
+    console.log('Recognition started, lang=', recognition.lang);
+  } catch (e) {
+    console.warn('Could not start recognition:', e);
+  }
+}
+
+function stopListening(){
+  micActive = false;
+  if(recognition){
+    try{ recognition.stop(); }catch(e){}
+  }
+  updateMicUI(false);
+}
+
+function toggleMic(){
+  if(micActive) stopListening(); else startListening();
   playSound();
+}
+
+function updateMicUI(listening){
+  micBtn.setAttribute('aria-pressed', listening ? 'true' : 'false');
+  if(listening){
+    micBtn.classList.add('listening');
+  } else {
+    micBtn.classList.remove('listening');
+  }
+}
+
+/* Utambuzi - handle results (EN + SW) */
+function handleSpeechResult(event){
+  for(let i=event.resultIndex; i<event.results.length; ++i){
+    if(event.results[i].isFinal){
+      const spokenRaw = event.results[i][0].transcript.trim();
+      const spoken = spokenRaw.toLowerCase();
+      console.log('Heard:', spokenRaw);
+
+      // ----- NAME detection (en) and JINA (sw) -----
+      // English patterns: "name is Taisoni", "my name is ..."
+      // Swahili patterns: "jina ni Taisoni", "mimi ni Taisoni", "jina Taisoni"
+      let nameMatched = null;
+      // swahili
+      const swNameMatch = spoken.match(/(?:jina\s*(?:ni)?\s*|mimi\s*ni\s*)([a-zA-Z\u00C0-\u017F\s]+)/i);
+      if(swNameMatch) nameMatched = swNameMatch[1].trim();
+      // english
+      const enNameMatch = spoken.match(/(?:my name is|name is|i am)\s+([a-zA-Z\u00C0-\u017F\s]+)/i);
+      if(!nameMatched && enNameMatch) nameMatched = enNameMatch[1].trim();
+      if(nameMatched){
+        document.getElementById('farmerName').value = capitalizeWords(nameMatched);
+        speakText(currentLang==='en'?`Hello ${nameMatched}`:`Habari ${nameMatched}`, 'female');
+      }
+
+      // ----- GENDER detection -----
+      if(spoken.includes('male') || spoken.includes('mwanaume') || spoken.includes('me')) {
+        document.getElementById('gender').value = 'male';
+      } else if(spoken.includes('female') || spoken.includes('mwanamke') || spoken.includes('female')) {
+        document.getElementById('gender').value = 'female';
+      }
+
+      // ----- REGION detection (try exact region name / swahili name) -----
+      regionsAPI.forEach(r=>{
+        if(spoken.includes(r.name.toLowerCase())){
+          document.getElementById('region').value = JSON.stringify(r);
+        }
+      });
+
+      // ----- CROP detection: try both EN and SW names -----
+      cropsEN.forEach(cEn => {
+        if(spoken.includes(cEn.toLowerCase())) {
+          cropSelect.value = cEn;
+          // find corresponding thumb and mark selected
+          const corIndex = cropsEN.indexOf(cEn);
+          const swName = cropsSW[corIndex];
+          document.querySelectorAll('.thumb').forEach(t => t.classList.remove('selected'));
+          const matchThumb = Array.from(document.querySelectorAll('.thumb')).find(t => (t.dataset.crop||'').toLowerCase() === (cEn.toLowerCase()));
+          if(matchThumb) matchThumb.classList.add('selected');
+        }
+      });
+      // also swahili variants
+      cropsSW.forEach((cSw, idx) => {
+        if(spoken.includes(cSw.toLowerCase())){
+          const cEn = cropsEN[idx];
+          cropSelect.value = cEn;
+          document.querySelectorAll('.thumb').forEach(t => t.classList.remove('selected'));
+          const matchThumb = Array.from(document.querySelectorAll('.thumb')).find(t => (t.dataset.crop||'').toLowerCase() === (cEn.toLowerCase()));
+          if(matchThumb) matchThumb.classList.add('selected');
+        }
+      });
+
+      // ----- COMMANDS (EN + SW) -----
+      if(spoken.includes('show trend') || spoken.includes('onyesha trend') || spoken.includes('onyesha tabia') || spoken.includes('onyesha mwenendo')){
+        showTrend();
+      }
+      if(spoken.includes('show advice') || spoken.includes('onyesha ushauri') || spoken.includes('ushauri') || spoken.includes('show advice')){
+        showAdvice();
+      }
+      if(spoken.includes('check weather') || spoken.includes('angalia hali ya hewa') || spoken.includes('hali ya hewa')){
+        checkWeather();
+      }
+      if(spoken.includes('forecast') || spoken.includes('utafitia') || spoken.includes('matangazo') || spoken.includes('tabiri')){
+        forecast5Days();
+      }
+
+      // Optional: speak back short confirmation in current language
+      // speakText(currentLang==='en'?`I heard: ${spokenRaw}`:`Nimesikia: ${spokenRaw}`, 'female');
+    }
+  }
+}
+
+/* small helper to capitalize name words */
+function capitalizeWords(s){
+  return s.split(' ').map(p => p.charAt(0).toUpperCase()+p.slice(1)).join(' ');
+}
+
+/* hook up button */
+micBtn.addEventListener('click', (e)=>{
+  e.preventDefault();
+  toggleMic();
 });
+/* ensure UI initial state */
+updateMicUI(false);
+
 </script>
 </body>
 </html>
