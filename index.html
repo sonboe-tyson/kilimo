@@ -5,22 +5,29 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Agricultural Advisory System</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Leaflet CSS & JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-sA+4h2f2kGk3s8wH3qk4Xg8b8f0m1fD6v+qg1gGkP3s=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-Vj7m2vYbJjA7K8r6R6q3s1kH8y4y9u2qv3q1kGm8G1o=" crossorigin=""></script>
+
 <style>
 :root{ --red:#e74c3c; --green:#2e8b57; --green-dark:#246b45;}
 body{ font-family:'Poppins',sans-serif; margin:0; padding:0; background:rgba(200,255,200,0.25); background-image:url('background.jpg'); background-size:cover; background-position:center;}
 header{text-align:center; background:var(--green); color:#fff; padding:18px 10px; font-size:26px; font-weight:700;}
-.container{ max-width:700px; margin:28px auto; background:#ffffffe6; padding:22px; border-radius:14px; box-shadow:0 6px 30px rgba(0,0,0,0.15);}
+.container{ max-width:980px; margin:28px auto; background:#ffffffe6; padding:22px; border-radius:14px; box-shadow:0 6px 30px rgba(0,0,0,0.15);}
 .profile{ display:flex; justify-content:flex-end; align-items:center; gap:14px; animation:fadeIn 1s ease-in-out;}
 .profile img{ width:50px; height:50px; border-radius:50%; object-fit:cover; border:2px solid #C0392B; animation:pulse 2s infinite;}
-.profile .subtitle{text-align:center; font-size:10px; color:#16A085; line-height:1.1; white-space:pre-line; animation:fadeIn 1s ease-in-out;}
+.profile .subtitle{text-align:center; font-size:12px; color:#16A085; line-height:1.1; white-space:pre-line; animation:fadeIn 1s ease-in-out;}
 form .row{ display:flex; gap:18px; align-items:flex-start; flex-wrap:wrap; }
-.left, .right { flex:1 1 320px; min-width:280px; }
+.left, .right { flex:1 1 420px; min-width:320px; }
 label{ display:block; margin-top:8px; font-weight:600; color:#222; }
 input, select, button { width:100%; padding:10px; margin-top:6px; border-radius:8px; border:1px solid #ccc; font-size:15px; }
 button{ background:#27AE60; color:white; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; animation:fadeIn 1s ease-in-out;}
 button:hover{ background:#E67E22; animation:bounce 0.5s;}
 button.vertical{ flex-direction:column; padding:12px; font-size:16px;}
-#adviceResult{ margin-top:16px; padding:15px; border-radius:10px; background: rgba(255,0,0,0.1); font-weight:600; color:#FFA07A; white-space:pre-line; animation:fadeIn 1s ease-in-out;}
+#adviceResult{ margin-top:16px; padding:15px; border-radius:10px; background: rgba(255,0,0,0.04); font-weight:600; color:#333; white-space:pre-line; animation:fadeIn 1s ease-in-out;}
 canvas{ margin-top:20px; width:100% !important; height:400px !important; }
 .crop-thumbs{ display:flex; gap:20px; flex-wrap:wrap; margin-top:20px; }
 .thumb{ width:90px; height:70px; border-radius:8px; overflow:hidden; border:2px solid transparent; cursor:pointer; text-align:center; display:flex; align-items:center; justify-content:center; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
@@ -28,6 +35,8 @@ canvas{ margin-top:20px; width:100% !important; height:400px !important; }
 .thumb.selected{ border-color:var(--red); box-shadow:0 4px 14px rgba(231,76,60,0.3); }
 .lang-area{ text-align:center; margin-top:8px; }
 .meta-small{ font-size:13px; color:#555; margin-top:6px; }
+
+/* Global mic style */
 .globalMicBtn{ background:#E67E22; color:#fff; font-weight:bold; border-radius:50%; width:30px; height:30px; display:flex; align-items:center; justify-content:center; margin:auto; margin-bottom:12px; animation: pulse 1.5s infinite; cursor:pointer; border:3px solid #fff; font-size:20px;}
 .globalMicBtn.listening {
   box-shadow: 0 0 0 8px rgba(255,0,0,0.12), 0 0 24px rgba(255,0,0,0.08);
@@ -43,11 +52,37 @@ canvas{ margin-top:20px; width:100% !important; height:400px !important; }
   opacity:0.9;
 }
 
-@keyframes pulse{0%{transform:scale(1);}50%{transform:scale(1.2);}100%{transform:scale(1);}}
-@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
+/* Map container large + overlay button */
+#mapContainer{ position:relative; border-radius:10px; overflow:hidden; margin:12px 0; }
+#map{ width:100%; height:500px; display:block; }
+.mapLocationBtn{
+  position:absolute;
+  top:12px;
+  right:12px;
+  z-index:1000;
+  background:#27AE60;
+  color:#fff;
+  border:none;
+  padding:10px 12px;
+  border-radius:8px;
+  cursor:pointer;
+  box-shadow:0 6px 18px rgba(0,0,0,0.15);
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-weight:700;
+}
+.mapLocationBtn:hover{ background:#1f8b4a; }
+
+/* small responsive tweaks */
+@media (max-width:980px){
+  .left, .right { min-width:100%; }
+  .profile { justify-content:center; text-align:center; }
+}
+@keyframes pulse{0%{transform:scale(1);}50%{transform:scale(1.2);}100%{transform:scale(1);} }
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);} }
 .fade-in{ animation:fadeIn 0.8s ease-in-out; }
 @keyframes fadeIn{ from {opacity:0; transform: translateY(10px);} to {opacity:1; transform:translateY(0);} }
-@media (max-width:720px){ .left, .right { min-width:100%; } .crop-thumbs{ justify-content:flex-start; } }
 </style>
 </head>
 <body>
@@ -63,12 +98,18 @@ canvas{ margin-top:20px; width:100% !important; height:400px !important; }
     <div><img id="profileImg" src="profile.jpg" alt="Profile"></div>
     <div class="subtitle">
 
-Name:Taisoni Ambokile Mwaluswaswa
+Name: Taisoni Ambokile Mwaluswaswa
 📞Phone No:0749458547
-Professionalism:GIS and RS Expert
-📧 Gmail:taisonimwuluswaswa@gmail.com   
+Professionalism: GIS and RS Expert
+📧 Gmail:taisonimwuluswaswa@gmail.com
 
     </div>
+  </div>
+
+  <!-- MAP CONTAINER (large) -->
+  <div id="mapContainer">
+    <div id="map"></div>
+    <button id="useLocationBtn" class="mapLocationBtn" title="Use My Location">📍 Use My Location</button>
   </div>
 
   <form id="mainForm" onsubmit="return false;">
@@ -120,14 +161,17 @@ Professionalism:GIS and RS Expert
 </div>
 
 <script>
-const apiKey = "4970f8ff4bc343c5721c08b2e682f022";
+/* ===========================
+   Existing app variables & data
+   =========================== */
+const apiKey = "4970f8ff4bc343c5721c08b2e682f022"; // OpenWeatherMap - keep as before
 let currentLang = 'en';
 let chartInstance = null;
 const startYear = 2016, endYear = 2025;
 const monthsNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const totalMonths = (endYear-startYear+1)*12;
 
-// ---------------- REGIONS ----------------
+/* Regions list (used to find nearest region based on coords) */
 const regionsAPI = [
   { name: "Songwe", lat: -9.258, lng: 33.642 },
   { name: "Mbeya", lat: -8.910, lng: 33.450 },
@@ -143,18 +187,14 @@ const regionsAPI = [
   { name: "Tunduma", lat: -9.300, lng: 32.800 }
 ];
 
-// ---------------- CROPS ----------------
+/* Crops + images + generated data (same as before) */
 const cropsEN = ["Corn","Rice","Tea","Coffee","Beans","Potatoes","Cassava"];
 const cropsSW = ["Mahindi","Mpunga","Chai","Kahawa","Maharage","Viazi","Ufuta"];
 const cropImages = { Mahindi:"mahindi.jpg", Mpunga:"mpunga.jpg", Chai:"chai.jpg", Kahawa:"kahawa.jpg", Maharage:"maharage.jpg", Viazi:"viazi.jpg", Ufuta:"ufuta.jpg" };
-
-// ---------------- BUILD MONTHLY LABELS ----------------
 const monthlyLabels=[];
 for(let y=startYear; y<=endYear; y++){
   for(let m=0;m<12;m++){ monthlyLabels.push(`${y} ${monthsNames[m]}`); }
 }
-
-// ---------------- RANDOM DATA FOR CROPS ----------------
 const cropData = {};
 cropsSW.forEach(c=>{
   const rainfall=[], temperature=[], ndvi=[];
@@ -186,7 +226,7 @@ cropsSW.forEach(c=>{
   cropData[c] = { rainfall, temperature, ndvi, requirements:req };
 });
 
-// ---------------- POPULATE CROPS ----------------
+/* ---------------- Populate crops & regions ---------------- */
 const cropSelect = document.getElementById('cropSelect');
 const thumbsDiv = document.getElementById('cropThumbs');
 function populateCrops(){
@@ -209,7 +249,6 @@ function populateCrops(){
 }
 populateCrops();
 
-// ---------------- POPULATE REGIONS ----------------
 function populateRegions(){
   const regionSelect=document.getElementById('region');
   regionSelect.innerHTML='<option value="">Select Region</option>';
@@ -224,11 +263,9 @@ function getSelectedRegionData(){
   return val?JSON.parse(val):null;
 }
 
-// ---------------- SOUND ----------------
+/* ---------------- Sound & speech ---------------- */
 const clickSoundURL='https://www.soundjay.com/buttons/sounds/button-16.mp3';
 function playSound(){ try{ const a=new Audio(clickSoundURL); a.volume=0.35; a.play(); }catch(e){} }
-
-// ---------------- VOICE SPEECH ----------------
 function speakText(text, gender){
   const utter = new SpeechSynthesisUtterance(text);
   utter.lang=currentLang==='en'?'en-US':'sw-TZ';
@@ -238,7 +275,7 @@ function speakText(text, gender){
   playSound();
 }
 
-// ---------------- TREND CHART ----------------
+/* ---------------- Chart (same as before) ---------------- */
 function showTrend(){
   const cropName=cropSelect.value;
   if(!cropName){ alert(currentLang==='en'?'Please select a crop first!':'Tafadhali chagua zao kwanza!'); return; }
@@ -273,7 +310,7 @@ function showTrend(){
   playSound();
 }
 
-// ---------------- ADVICE ----------------
+/* ---------------- Advice (same as before) ---------------- */
 function showAdvice(){
   const name=(document.getElementById('farmerName').value || (currentLang==='en'?'Farmer':'Mkulima')).trim();
   const cropName=cropSelect.value; 
@@ -297,18 +334,20 @@ function showAdvice(){
   speakText(adviceText, gender);
 }
 
-// ---------------- WEATHER ----------------
+/* ---------------- Weather functions ---------------- */
 function checkWeather(){
   const region=getSelectedRegionData();
   if(!region){ alert(currentLang==='en'?'Please select a region first!':'Tafadhali chagua mkoa kwanza!'); return; }
-  const lat=region.lat; const lon=region.lng;
+  checkWeatherAt(region.lat, region.lng);
+}
 
+function checkWeatherAt(lat, lon){
   fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`)
   .then(res=>res.json())
   .then(data=>{
     let text="";
     for(let i=0;i<5;i++){
-      const dayData = data.list[i*8]; // roughly every 24h
+      const dayData = data.list[i*8];
       if(currentLang==='en'){
         text+=`Day ${i+1} (${dayData.dt_txt.split(' ')[0]}): Temp ${dayData.main.temp}°C, Humidity ${dayData.main.humidity}%, ${dayData.weather[0].description}, Rain chance ${(dayData.pop*100).toFixed(0)}%\n`;
       } else {
@@ -330,21 +369,18 @@ function checkWeather(){
     chartInstance = new Chart(ctx,{
       type:'line',
       data:{
-        labels:[...Array(5)].map((_,i)=>`Day ${i+1}`),
+        labels:[...Array(5)].map((_,i)=> currentLang==='en'?`Day ${i+1}`:`Siku ${i+1}`),
         datasets:[
-          {label:'Temperature °C', data:temps, borderColor:'#ff9933', backgroundColor:'#ffd699', fill:false, tension:0.25},
-          {label:'Rain Chance %', data:rains, borderColor:'#0066cc', backgroundColor:'#99ccff', fill:false, tension:0.25}
+          {label: currentLang==='en'?'Temperature °C':'Joto °C', data:temps, borderColor:'#ff9933', backgroundColor:'#ffd699', fill:false, tension:0.25},
+          {label: currentLang==='en'?'Rain Chance %':'Uwezekano wa Mvua %', data:rains, borderColor:'#0066cc', backgroundColor:'#99ccff', fill:false, tension:0.25}
         ]
       },
       options:{ responsive:true, plugins:{ legend:{position:'top'} } }
     });
-  }).catch(err=>{ alert('Weather API error'); console.error(err); });
+  }).catch(err=>{ alert(currentLang==='en'?'Weather API error':'Hitilafu ya Weather API'); console.error(err); });
 }
 
-// ---------------- 5-DAY FORECAST BUTTON ----------------
-function forecast5Days(){ checkWeather(); }
-
-// ---------------- LANGUAGE TOGGLE ----------------
+/* ------------- Language toggle ------------- */
 document.getElementById('langToggle').addEventListener('click', ()=>{
   currentLang=currentLang==='en'?'sw':'en';
   document.getElementById('siteHeader').innerText=currentLang==='en'?'Agricultural Advisory System':'Mfumo wa Ushauri Kilimo';
@@ -353,9 +389,12 @@ document.getElementById('langToggle').addEventListener('click', ()=>{
   document.getElementById('lblRegion').innerText=currentLang==='en'?'Region:':'Mkoa:';
   document.getElementById('lblCrop').innerText=currentLang==='en'?'Crop:':'Zao:';
   document.getElementById('lblChartType').innerText=currentLang==='en'?'Chart Type:':'Aina ya Chati:';
+  // repopulate crops text & region text if needed
   populateCrops();
+  populateRegions();
 });
 
+/* ------------- Voice recognition (same as before) ------------- */
 const micBtn = document.getElementById('globalMicBtn');
 let recognition = null;
 let micActive = false;
@@ -372,11 +411,9 @@ function createRecognition(){
   r.onerror = (e) => {
     console.error('SpeechRecognition error:', e);
     stopListening();
-    // show friendly message to user
     alert(currentLang==='en'?'Voice recognition error. Check microphone permissions.':'Hitilafu ya utambuzi wa sauti. Angalia ruhusa za mikrofoni.');
   };
   r.onend = () => {
-    // if micActive is true, restart (resilient continuous mode)
     if(micActive){
       try { r.start(); } catch(e){ console.warn('Could not restart recognition', e); }
     } else {
@@ -394,7 +431,6 @@ function startListening(){
   }
   if(!recognition) recognition = createRecognition();
   if(!recognition) return;
-  // update lang to latest currentLang
   recognition.lang = currentLang === 'en' ? 'en-US' : 'sw-TZ';
   try {
     recognition.start();
@@ -437,13 +473,9 @@ function handleSpeechResult(event){
       console.log('Heard:', spokenRaw);
 
       // ----- NAME detection (en) and JINA (sw) -----
-      // English patterns: "name is Taisoni", "my name is ..."
-      // Swahili patterns: "jina ni Taisoni", "mimi ni Taisoni", "jina Taisoni"
       let nameMatched = null;
-      // swahili
       const swNameMatch = spoken.match(/(?:jina\s*(?:ni)?\s*|mimi\s*ni\s*)([a-zA-Z\u00C0-\u017F\s]+)/i);
       if(swNameMatch) nameMatched = swNameMatch[1].trim();
-      // english
       const enNameMatch = spoken.match(/(?:my name is|name is|i am)\s+([a-zA-Z\u00C0-\u017F\s]+)/i);
       if(!nameMatched && enNameMatch) nameMatched = enNameMatch[1].trim();
       if(nameMatched){
@@ -458,26 +490,22 @@ function handleSpeechResult(event){
         document.getElementById('gender').value = 'female';
       }
 
-      // ----- REGION detection (try exact region name / swahili name) -----
+      // ----- REGION detection -----
       regionsAPI.forEach(r=>{
         if(spoken.includes(r.name.toLowerCase())){
           document.getElementById('region').value = JSON.stringify(r);
         }
       });
 
-      // ----- CROP detection: try both EN and SW names -----
+      // ----- CROP detection -----
       cropsEN.forEach(cEn => {
         if(spoken.includes(cEn.toLowerCase())) {
           cropSelect.value = cEn;
-          // find corresponding thumb and mark selected
-          const corIndex = cropsEN.indexOf(cEn);
-          const swName = cropsSW[corIndex];
-          document.querySelectorAll('.thumb').forEach(t => t.classList.remove('selected'));
+          document.querySelectorAll('.thumb').forEach(x=>x.classList.remove('selected'));
           const matchThumb = Array.from(document.querySelectorAll('.thumb')).find(t => (t.dataset.crop||'').toLowerCase() === (cEn.toLowerCase()));
           if(matchThumb) matchThumb.classList.add('selected');
         }
       });
-      // also swahili variants
       cropsSW.forEach((cSw, idx) => {
         if(spoken.includes(cSw.toLowerCase())){
           const cEn = cropsEN[idx];
@@ -501,25 +529,117 @@ function handleSpeechResult(event){
       if(spoken.includes('forecast') || spoken.includes('utafitia') || spoken.includes('matangazo') || spoken.includes('tabiri')){
         forecast5Days();
       }
-
-      // Optional: speak back short confirmation in current language
-      // speakText(currentLang==='en'?`I heard: ${spokenRaw}`:`Nimesikia: ${spokenRaw}`, 'female');
     }
   }
 }
 
-/* small helper to capitalize name words */
 function capitalizeWords(s){
   return s.split(' ').map(p => p.charAt(0).toUpperCase()+p.slice(1)).join(' ');
 }
-
-/* hook up button */
-micBtn.addEventListener('click', (e)=>{
-  e.preventDefault();
-  toggleMic();
-});
-/* ensure UI initial state */
+micBtn.addEventListener('click', (e)=>{ e.preventDefault(); toggleMic(); });
 updateMicUI(false);
+
+/* ------------- LEAFLET MAP integration ------------- */
+let map = null;
+let userMarker = null;
+
+function initMap(lat = -6.7924, lng = 39.2083) {
+  // initialize if not already
+  if(!map){
+    map = L.map('map').setView([lat, lng], 7);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+  } else {
+    map.setView([lat, lng], 10);
+  }
+}
+
+function findNearestRegion(lat, lng) {
+  let nearest = null, minDist = Infinity;
+  regionsAPI.forEach(r => {
+    const dist = Math.sqrt(Math.pow(lat - r.lat, 2) + Math.pow(lng - r.lng, 2));
+    if (dist < minDist) {
+      minDist = dist;
+      nearest = r;
+    }
+  });
+  return nearest;
+}
+
+function setRegionByCoords(lat, lng){
+  const closest = findNearestRegion(lat, lng);
+  if(closest){
+    document.getElementById('region').value = JSON.stringify(closest);
+    return closest;
+  }
+  return null;
+}
+
+/* When user clicks the map button */
+document.getElementById('useLocationBtn').addEventListener('click', () => {
+  getLocation();
+});
+
+function getLocation(){
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(showPosition, showError, { enableHighAccuracy:true, timeout:10000 });
+  } else {
+    alert(currentLang === 'en' ? "Geolocation is not supported by your browser." : "Kivinjari hakina uwezo wa kupata eneo lako.");
+  }
+}
+
+function showPosition(position){
+  const lat = position.coords.latitude;
+  const lng = position.coords.longitude;
+
+  initMap(lat,lng);
+  map.setView([lat,lng], 10);
+
+  // remove previous marker
+  if(userMarker) userMarker.remove();
+
+  // find nearest region and set select
+  const nearest = setRegionByCoords(lat,lng);
+
+  // prepare popup text depending on language
+  let popupText = "";
+  if(nearest){
+    popupText = currentLang==='en' ? `You are in ${nearest.name}` : `Upo Mkoa wa ${nearest.name}`;
+  } else {
+    popupText = currentLang==='en' ? `Your location: ${lat.toFixed(4)}, ${lng.toFixed(4)}` : `Eneo lako: ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+  }
+
+  userMarker = L.marker([lat,lng]).addTo(map);
+  userMarker.bindPopup(popupText).openPopup();
+
+  // call weather for these coords
+  checkWeatherAt(lat, lng);
+}
+
+function showError(error) {
+  let message = "";
+  switch (error.code) {
+    case error.PERMISSION_DENIED:
+      message = currentLang === 'en' ? "Permission denied. Allow location access." : "Umezuia ruhusa ya eneo. Ruhusu kupata eneo.";
+      break;
+    case error.POSITION_UNAVAILABLE:
+      message = currentLang === 'en' ? "Location information unavailable." : "Habari za eneo hazipatikani.";
+      break;
+    case error.TIMEOUT:
+      message = currentLang === 'en' ? "Request timed out." : "Ombi limechelewa sana.";
+      break;
+    default:
+      message = currentLang === 'en' ? "An unknown error occurred." : "Hitilafu isiyojulikana imetokea.";
+  }
+  alert(message);
+}
+
+/* Initialize map on load */
+window.addEventListener('load', ()=>{
+  initMap(); // default center
+});
 
 </script>
 </body>
