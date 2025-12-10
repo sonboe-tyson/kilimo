@@ -26,7 +26,7 @@ button.vertical{ flex-direction:column; padding:12px; font-size:16px;}
 #adviceResult{ margin-top:16px; padding:15px; border-radius:10px; background: rgba(255,0,0,0.04); font-weight:600; color:#333; white-space:pre-line; animation:fadeIn 1s ease-in-out;}
 canvas{ margin-top:20px; width:100% !important; height:400px !important; }
 .crop-thumbs{ display:flex; gap:20px; flex-wrap:wrap; margin-top:20px; }
-.thumb{ width:90px; height:70px; border-radius:8px; overflow:hidden; border:2px solid transparent; cursor:pointer; text-align:center; display:flex; align-items:center; justify-content:center; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
+.thumb{ width:100px; height:100px; border-radius:10px; overflow:hidden; border:2px solid transparent; cursor:pointer; text-align:center; display:flex; align-items:center; justify-content:center; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
 .thumb img{ width:180%; height:150%; object-fit:cover; display:block; }
 .thumb.selected{ border-color:var(--red); box-shadow:0 4px 14px rgba(231,76,60,0.3); }
 .lang-area{ text-align:center; margin-top:8px; }
@@ -48,33 +48,64 @@ canvas{ margin-top:20px; width:100% !important; height:400px !important; }
   opacity:0.9;
 }
 
-/* Map container large + overlay button */
-#mapContainer{ position:relative; border-radius:10px; overflow:hidden; margin:12px 0; }
-#map{ width:100%; height:500px; display:block; }
-.mapLocationBtn{
-  position:absolute;
-  top:12px;
-  right:12px;
-  z-index:1000;
-  background:#27AE60;
-  color:#fff;
-  border:none;
-  padding:10px 12px;
-  border-radius:8px;
-  cursor:pointer;
-  box-shadow:0 6px 18px rgba(0,0,0,0.15);
-  display:flex;
-  align-items:center;
-  gap:8px;
-  font-weight:700;
+/* FRAME ya ramani */
+#mapContainer {
+  position: relative;
+  width: 100%;
+  height: auto;
+  border: 3px solid #1abc9c;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 22px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
 }
-.mapLocationBtn:hover{ background:#1f8b4a; }
 
-/* small responsive tweaks */
-@media (max-width:980px){
-  .left, .right { min-width:100%; }
-  .profile { justify-content:center; text-align:center; }
+/* Ramani yenyewe */
+#map {
+  width: 50%;
+  height: 480px;
 }
+
+/* Spinner wakati inatafuta location */
+#locSpinner {
+  position: absolute;
+  top: 50%; 
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70px;
+  height: 70px;
+  border: 8px solid #ddd;
+  border-top: 8px solid #27ae60;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+  display: none;
+  z-index: 2000;
+}
+
+@keyframes spin {
+  0% { transform: translate(-50%,-50%) rotate(0deg); }
+  100% { transform: translate(-50%,-50%) rotate(360deg); }
+}
+
+/* Button ya Use My Location */
+.mapLocationBtn {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  background: #27AE60;
+  color: #fff;
+  border: none;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-weight: 700;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.2);
+  cursor: pointer;
+  z-index: 2000;
+}
+.mapLocationBtn:hover {
+  background: #1e8b4c;
+}
+
 @keyframes pulse{0%{transform:scale(1);}50%{transform:scale(1.2);}100%{transform:scale(1);} }
 @keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);} }
 .fade-in{ animation:fadeIn 0.8s ease-in-out; }
@@ -95,18 +126,18 @@ canvas{ margin-top:20px; width:100% !important; height:400px !important; }
     <div class="subtitle">
 
 Name: Taisoni Ambokile Mwaluswaswa
-📞Phone No:0749458547
-Professionalism: GIS and RS Expert
-📧 Gmail:taisonimwuluswaswa@gmail.com
+☎️📞0749458547☎ 
+GIS and RS Expert
+📧 taisonimwuluswaswa@gmail.com
 
     </div>
   </div>
 
-  <!-- MAP CONTAINER (large) -->
   <div id="mapContainer">
     <div id="map"></div>
-    <button id="useLocationBtn" class="mapLocationBtn" title="Use My Location">📍 Use My Location</button>
-  </div>
+    <div id="locSpinner"></div>
+    <button id="useLocationBtn" class="mapLocationBtn">📍 Use My Location</button>
+</div>
 
   <form id="mainForm" onsubmit="return false;">
     <div class="row">
@@ -212,7 +243,7 @@ cropsSW.forEach(c=>{
   }
   let req="";
   switch(c){
-    case "Mahindi": req="Needs about 500–800 mm rainfall/year and 18–27°C."; break;
+    case "Mahindi": req=" about 500–800 mm rainfall/year and 18–27°C."; break;
     case "Mpunga": req="Requires 1000–2000 mm rainfall/year and warm temps (>25°C)."; break;
     case "Chai": req="Prefers 1200–2500 mm/year and 16–25°C."; break;
     case "Kahawa": req="Needs 1000–2000 mm/year and 18–26°C."; break;
@@ -324,7 +355,7 @@ function showAdvice(){
   const req=cropData[keySW].requirements;
   const schedObj=schedule[keySW];
   const adviceEN=`🙋🏾 Hello ${name}!\nCrop: ${cropName}\nRequirements: ${req}\nSchedule:\n- Planting: ${schedObj.plant}\n- Weeding: ${schedObj.weed}\n- Harvest: ${schedObj.harvest}`;
-  const adviceSW=`🙋🏾 Habari ndugu yangu ${name}!\nZao: ${cropName}\nMahitaji: ${req}\nRatiba:\n- Kupanda: ${schedObj.plant}\n- Kupalilia: ${schedObj.weed}\n- Kuvuna: ${schedObj.harvest}`;
+  const adviceSW=` ${name}🙋🏾! \n kama unataka kulima: ${cropName}\n zao hili linahitaji: ${req}\nRatiba:\n- Kupanda: ${schedObj.plant}\n- Kupalilia: ${schedObj.weed}\n- Kuvuna: ${schedObj.harvest}`;
   const adviceText=currentLang==='en'?adviceEN:adviceSW;
   document.getElementById('adviceResult').innerText = adviceText;
   speakText(adviceText, gender);
@@ -534,108 +565,122 @@ function capitalizeWords(s){
 }
 micBtn.addEventListener('click', (e)=>{ e.preventDefault(); toggleMic(); });
 updateMicUI(false);
-
-/* ------------- LEAFLET MAP integration ------------- */
+/* ========== LEAFLET MAP SECTION ========== */
 let map = null;
 let userMarker = null;
 
+/* Haversine formula kupata mkoa sahihi */
+function haversineDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a =
+    Math.sin(dLat/2) ** 2 +
+    Math.cos(lat1 * Math.PI/180) *
+    Math.cos(lat2 * Math.PI/180) *
+    Math.sin(dLon/2) ** 2;
+
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function findNearestRegion(lat, lng) {
+  let nearest = null;
+  let minDist = Infinity;
+
+  regionsAPI.forEach(r => {
+    const d = haversineDistance(lat, lng, r.lat, r.lng);
+    if (d < minDist) {
+      minDist = d;
+      nearest = r;
+    }
+  });
+
+  return nearest;
+}
+
+/* Initialize map */
 function initMap(lat = -6.7924, lng = 39.2083) {
-  // initialize if not already
-  if(!map){
-    map = L.map('map').setView([lat, lng], 7);
+  if (!map) {
+    map = L.map('map').setView([lat, lng], 8);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
-      attribution: '&copy; OpenStreetMap contributors'
+      attribution: '&copy; OpenStreetMap'
     }).addTo(map);
   } else {
     map.setView([lat, lng], 10);
   }
 }
 
-function findNearestRegion(lat, lng) {
-  let nearest = null, minDist = Infinity;
-  regionsAPI.forEach(r => {
-    const dist = Math.sqrt(Math.pow(lat - r.lat, 2) + Math.pow(lng - r.lng, 2));
-    if (dist < minDist) {
-      minDist = dist;
-      nearest = r;
-    }
-  });
-  return nearest;
-}
+/* Button event */
+document.getElementById("useLocationBtn").addEventListener("click", getLocation);
 
-function setRegionByCoords(lat, lng){
-  const closest = findNearestRegion(lat, lng);
-  if(closest){
-    document.getElementById('region').value = JSON.stringify(closest);
-    return closest;
-  }
-  return null;
-}
+/* Get user location */
+function getLocation() {
+  document.getElementById("locSpinner").style.display = "block";
 
-/* When user clicks the map button */
-document.getElementById('useLocationBtn').addEventListener('click', () => {
-  getLocation();
-});
-
-function getLocation(){
   if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(showPosition, showError, { enableHighAccuracy:true, timeout:10000 });
+    navigator.geolocation.getCurrentPosition(showPosition, showError, {
+      enableHighAccuracy: true,
+      timeout: 10000
+    });
   } else {
-    alert(currentLang === 'en' ? "Geolocation is not supported by your browser." : "Kivinjari hakina uwezo wa kupata eneo lako.");
+    alert("Geolocation not supported.");
+    document.getElementById("locSpinner").style.display = "none";
   }
 }
 
-function showPosition(position){
-  const lat = position.coords.latitude;
-  const lng = position.coords.longitude;
+/* Show position */
+async function showPosition(pos) {
+  const lat = pos.coords.latitude;
+  const lng = pos.coords.longitude;
 
-  initMap(lat,lng);
-  map.setView([lat,lng], 10);
+  document.getElementById("locSpinner").style.display = "none";
 
-  // remove previous marker
-  if(userMarker) userMarker.remove();
+  initMap(lat, lng);
 
-  // find nearest region and set select
-  const nearest = setRegionByCoords(lat,lng);
+  if (userMarker) userMarker.remove();
+  userMarker = L.marker([lat, lng]).addTo(map);
 
-  // prepare popup text depending on language
-  let popupText = "";
-  if(nearest){
-    popupText = currentLang==='en' ? `You are in ${nearest.name}` : `Upo Mkoa wa ${nearest.name}`;
-  } else {
-    popupText = currentLang==='en' ? `Your location: ${lat.toFixed(4)}, ${lng.toFixed(4)}` : `Eneo lako: ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+  // Reverse geocoding
+  let streetText = "";
+  try {
+    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`;
+    const res = await fetch(url);
+    const data = await res.json();
+
+    const a = data.address;
+    streetText = `${a.road || ""}, ${a.suburb || ""}, ${a.town || a.city || ""}, ${a.state || ""}`;
+  } catch (e) {
+    streetText = `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`;
   }
 
-  userMarker = L.marker([lat,lng]).addTo(map);
-  userMarker.bindPopup(popupText).openPopup();
+  userMarker.bindPopup(streetText).openPopup();
 
-  // call weather for these coords
+  // Update region
+  const nearest = findNearestRegion(lat, lng);
+  if (nearest) {
+    document.getElementById("region").value = JSON.stringify(nearest);
+  }
+
+  // Trigger weather function (hii inatoka kwenye system yako)
   checkWeatherAt(lat, lng);
 }
 
+/* Error */
 function showError(error) {
-  let message = "";
-  switch (error.code) {
-    case error.PERMISSION_DENIED:
-      message = currentLang === 'en' ? "Permission denied. Allow location access." : "Umezuia ruhusa ya eneo. Ruhusu kupata eneo.";
-      break;
-    case error.POSITION_UNAVAILABLE:
-      message = currentLang === 'en' ? "Location information unavailable." : "Habari za eneo hazipatikani.";
-      break;
-    case error.TIMEOUT:
-      message = currentLang === 'en' ? "Request timed out." : "Ombi limechelewa sana.";
-      break;
-    default:
-      message = currentLang === 'en' ? "An unknown error occurred." : "Hitilafu isiyojulikana imetokea.";
-  }
-  alert(message);
+  document.getElementById("locSpinner").style.display = "none";
+  let msg = "Error getting location.";
+
+  if (error.code === 1) msg = "Permission denied.";
+  if (error.code === 2) msg = "Location unavailable.";
+  if (error.code === 3) msg = "Timeout.";
+
+  alert(msg);
 }
 
-/* Initialize map on load */
-window.addEventListener('load', ()=>{
-  initMap(); // default center
-});
+/* Load map on start */
+window.addEventListener("load", () => initMap());
+
 
 </script>
 </body>
